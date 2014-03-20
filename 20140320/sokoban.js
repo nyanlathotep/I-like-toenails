@@ -39,22 +39,9 @@ BaseGame.prototype.init = function() {
 			"    #_____#########",
 			"    #######        "
 		]);
-	/*for (i = 0; i < this.geometry.w; i++) {
-		for (j = 0; j < this.geometry.h; j++) {
-			if ((i + j) % 2 == 0) {
-				c = '#888888';
-			} else {
-				c = '#bbbbbb';
-			}
-			a = Crafty.e('Tile, Color')
-				.color(c);
-			a.at(i, j);
-		}
-	}*/
 }
 
 BaseGame.prototype.setTile = function(x, y, tile) {
-	//console.log(x,y);
 	if (this.tiles[x][y] != null) {
 		this.tiles[x][y].destroy()
 		this.tiles[x][y] = null
@@ -65,17 +52,25 @@ BaseGame.prototype.setTile = function(x, y, tile) {
 
 BaseGame.prototype.clearLevel = function() {
 	for (i = 0; i < this.geometry.w; i++) {
-		this.tiles[i] = [];
+		if (!this.tiles[i]) {
+			this.tiles[i] = [];
+		}
 		for (j = 0; j < this.geometry.h; j++) {
+			if (this.tiles[i][j]) {
+				this.tiles[i][j].destroy();
+			}
 			this.tiles[i][j] = null;
 		}
 	}
+	for (i = 0; i < this.actors.length; i++) {
+		this.actors[i].destroy();
+	}
+	this.actors = [];
 }
 
 BaseGame.prototype.createActor = function(x, y, type) {
 	this.actors[this.actors.length] = Crafty.e(type);
 	this.actors[this.actors.length-1].at(x, y);
-	//this.tiles[x][y].addActor(this.actors[this.actors.length-1]);
 }
 
 BaseGame.prototype.loadLevel = function(level) {
