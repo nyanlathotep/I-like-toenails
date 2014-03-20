@@ -15,22 +15,14 @@ Crafty.c('Actor', {
 						actors[actors.length] = a;
 					}
 				}
-				console.log(this.ident);
 				for (i = 0; i < actors.length; i++) {
-					console.log(actors[i]);
-					console.log(actors[i].pathable);
-					console.log(actors[i].pushable);
 					if (!(actors[i].pathable & this.ident)) {
-						console.log('not pathable');
 						if (actors[i].pushable & this.ident) {
 							if (!actors[i].move(x, y)) {
-								console.log('not pathable, pusable, couldn\'t push');
 								return false;								
 							}
-							console.log('not pathable, pusable, succeeding');
 						}
 						else {
-							console.log('not pathable, not pusable, failing');
 							return false;
 						}
 					}
