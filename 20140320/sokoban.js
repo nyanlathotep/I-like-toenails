@@ -24,7 +24,6 @@ BaseGame.prototype.init = function() {
 	Crafty.init(this.w(), this.h(), document.getElementById('game'));
 	Crafty.background('black');
 	this.tiles = [];
-	this.player = null;
 	this.actors = [];
 	this.clearLevel();
 	this.loadLevel([
@@ -74,13 +73,9 @@ BaseGame.prototype.clearLevel = function() {
 }
 
 BaseGame.prototype.createActor = function(x, y, type) {
-	if (type == 'Player') {
-		this.player = Crafty.e('Player');
-		this.player.at(x, y);
-	} else {
-		this.actors[this.actors.length] = Crafty.e(type);
-		this.actors[this.actors.length-1].at(x, y);
-	}
+	this.actors[this.actors.length] = Crafty.e(type);
+	this.actors[this.actors.length-1].at(x, y);
+	//this.tiles[x][y].addActor(this.actors[this.actors.length-1]);
 }
 
 BaseGame.prototype.loadLevel = function(level) {
