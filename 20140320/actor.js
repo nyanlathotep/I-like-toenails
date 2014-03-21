@@ -8,19 +8,31 @@ Crafty.c('Actor', {
 		this.vicAllow = 0;
 		this.controllable = false;
 		
-		this.move = function(x, y) {
+		this.move = function(x, y, test, force) {
 			var newx = this.at().x + x;
 			var newy = this.at().y + y;
+			if (newx < 0 || newx >= Game.geometry.w || 
+			    newy < 0 || newy >= Game.geometry.h) {
+					return false;
+				}
+			if (force) {
+				this.at(newx, newy);
+				return true;
+			}
 			if (!Game.tiles[newx] || !Game.tiles[newx][newy]) {
 				return false;
 			}
+			var pushed = [];
 			if (this.ident & Game.tiles[newx][newy].pathable) {
 				var actors = Game.actorsAt(newx, newy);
-				for (i = 0; i < actors.length; i++) {
+				for (var i = 0; i < actors.length; i++) {
 					if (!(actors[i].pathable & this.ident)) {
 						if (actors[i].pushable & this.ident) {
-							if (!actors[i].move(x, y)) {
+							tryPush = actors[i].move(x, y, test)
+							if (!tryPush) {
 								return false;								
+							} else {
+								pushed = pushed.concat(tryPush);
 							}
 						}
 						else {
@@ -28,8 +40,10 @@ Crafty.c('Actor', {
 						}
 					}
 				}
-				this.at(newx, newy);
-				return true;
+				if (!test) {
+					this.at(newx, newy);
+				}
+				return pushed.concat(this);
 			}
 			else {
 				return false;

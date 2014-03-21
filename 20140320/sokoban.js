@@ -7,10 +7,12 @@ function BaseGame() {
 			h: 40
 		}
 	};
-}
-
-function randint(a,b) {
-	return Math.floor(Math.random() * (b-a) + a);
+	this.history = {
+		moveCount: 0,
+		pushCount: 0,
+		moves: [],
+		curTime: 0
+	};
 }
 
 BaseGame.prototype.w = function() {
@@ -53,18 +55,18 @@ BaseGame.prototype.setTile = function(x, y, tile) {
 }
 
 BaseGame.prototype.clearLevel = function() {
-	for (i = 0; i < this.geometry.w; i++) {
+	for (var i = 0; i < this.geometry.w; i++) {
 		if (!this.tiles[i]) {
 			this.tiles[i] = [];
 		}
-		for (j = 0; j < this.geometry.h; j++) {
+		for (var j = 0; j < this.geometry.h; j++) {
 			if (this.tiles[i][j]) {
 				this.tiles[i][j].destroy();
 			}
 			this.tiles[i][j] = null;
 		}
 	}
-	for (i = 0; i < this.actors.length; i++) {
+	for (var i = 0; i < this.actors.length; i++) {
 		this.actors[i].destroy();
 	}
 	this.actors = [];
@@ -85,8 +87,8 @@ BaseGame.prototype.loadLevel = function(level) {
 	var bw = Math.floor((this.geometry.w - lw)/2);
 	var bh = Math.floor((this.geometry.h - lh)/2);
 	this.clearLevel();
-	for (j = 0; j < lh; j++) {
-		for (i = 0; i < lw; i++) {
+	for (var j = 0; j < lh; j++) {
+		for (var i = 0; i < lw; i++) {
 			var c = level[j][i];
 			var x = i + bw;
 			var y = j + bh;
@@ -113,7 +115,7 @@ BaseGame.prototype.loadLevel = function(level) {
 
 BaseGame.prototype.actorsAt = function(x, y) {
 	var actors = [];
-	for (i = 0; i < Game.actors.length; i++) {
+	for (var i = 0; i < Game.actors.length; i++) {
 		var a = Game.actors[i];
 		if (a.at().x == x && a.at().y == y) {
 			actors[actors.length] = a;
@@ -124,13 +126,52 @@ BaseGame.prototype.actorsAt = function(x, y) {
 
 BaseGame.prototype.controlActors = function() {
 	var actors = [];
-	for (i = 0; i < Game.actors.length; i++) {
+	for (var i = 0; i < Game.actors.length; i++) {
 		var a = Game.actors[i];
 		if (a.controllable) {
 			actors[actors.length] = a;
 		}
 	}
 	return actors;
+}
+
+BaseGame.prototype.vicActors = function() {
+	var actors = [];
+	for (var i = 0; i < Game.actors.length; i++) {
+		var a = Game.actors[i];
+		if (a.vicReq) {
+			actors[actors.length] = a;
+		}
+	}
+	return actors;
+}
+
+BaseGame.prototype.historyAdd = function(diff) {
+	this.history.moves = this.history.moves.slice(0, this.history.curTime);
+	this.history.moves = this.history.moves.concat([diff]);
+	this.history.curTime += 1;
+}
+
+BaseGame.prototype.historyForward = function() {
+	if (this.history.curTime == this.history.moves.length) {
+		return;
+	}
+	var diff = this.history.moves[this.history.curTime];
+	for (i = 0; i < diff[0].length; i++) {
+		diff[0][i].move(diff[1][0], diff[1][1], false, true);
+	}
+	this.history.curTime += 1;
+}
+
+BaseGame.prototype.historyBackward = function() {
+	if (this.history.curTime == 0) {
+		return;
+	}
+	this.history.curTime -= 1;
+	var diff = this.history.moves[this.history.curTime];	
+	for (i = 0; i < diff[0].length; i++) {
+		diff[0][i].move(-diff[1][0], -diff[1][1], false, true);
+	}
 }
 
 Game = new BaseGame();
