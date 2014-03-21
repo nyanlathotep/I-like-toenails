@@ -11,8 +11,7 @@ function BaseGame() {
 		moveCount: 0,
 		pushCount: 0,
 		moves: [],
-		curTime: 0,
-		hasWon: false
+		curTime: 0
 	};
 }
 
@@ -80,6 +79,13 @@ BaseGame.prototype.createActor = function(x, y, type) {
 }
 
 BaseGame.prototype.loadLevel = function(level) {
+	this.history = {
+		moveCount: 0,
+		pushCount: 0,
+		moves: [],
+		curTime: 0
+	};
+	this.updateGameBar();
 	var lw = level[0].length;
 	var lh = level.length;
 	if (lw > this.geometry.w || lh > this.geometry.h) {
@@ -191,9 +197,9 @@ BaseGame.prototype.updateGameBar = function() {
 	var histProg = this.history.curTime / this.history.moves.length * 100;
 	$('#progress .indicator').css('left', histProg + '%')
 	var histMargin = -3;
-	if (histProg < 2) {
+	if (histProg == 0) {
 		histMargin = 0;
-	} else if (histProg > 98) {
+	} else if (histProg == 100) {
 		histMargin = -6;
 	}
 	$('#progress .indicator').css('margin-left', histMargin);
@@ -255,7 +261,8 @@ BaseGame.prototype.checkVictory = function() {
 			return false;
 		}
 	}
-	return true;
+	alert('You win!');
+	this.loadLevelFromSet((this.lIndex + 1) % this.levelsets[this.lsIndex].levels.length);
 }
 
 Game = new BaseGame();
