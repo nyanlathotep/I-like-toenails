@@ -6,10 +6,14 @@ Crafty.c('Actor', {
 		this.pathable = 0;
 		this.vicReq = 0;
 		this.vicAllow = 0;
+		this.controllable = false;
 		
 		this.move = function(x, y) {
 			var newx = this.at().x + x;
 			var newy = this.at().y + y;
+			if (!Game.tiles[newx] || !Game.tiles[newx][newy]) {
+				return false;
+			}
 			if (this.ident & Game.tiles[newx][newy].pathable) {
 				var actors = Game.actorsAt(newx, newy);
 				for (i = 0; i < actors.length; i++) {
@@ -42,20 +46,7 @@ Crafty.c('Player', {
 		           z: 2});
 		this.ident = 4;
 		this.pathable = 2;
-		
-		this.handleKB = function(e) {
-			if (e.key == Crafty.keys.LEFT_ARROW) {
-				this.move(-1, 0)
-			} else if (e.key == Crafty.keys.RIGHT_ARROW) {
-				this.move(1, 0)
-			} else if (e.key == Crafty.keys.UP_ARROW) {
-				this.move(0, -1)
-			} else if (e.key == Crafty.keys.DOWN_ARROW) {
-				this.move(0, 1)
-			}
-		}
-		
-		this.bind('KeyDown', this.handleKB);
+		this.controllable = true;
 	}
 });
 

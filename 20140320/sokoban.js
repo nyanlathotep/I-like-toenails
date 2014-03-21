@@ -39,6 +39,8 @@ BaseGame.prototype.init = function() {
 			"    #_____#########",
 			"    #######        "
 		]);
+		
+	this.inputMan = Crafty.e('InputManager');
 }
 
 BaseGame.prototype.setTile = function(x, y, tile) {
@@ -114,6 +116,17 @@ BaseGame.prototype.actorsAt = function(x, y) {
 	for (i = 0; i < Game.actors.length; i++) {
 		var a = Game.actors[i];
 		if (a.at().x == x && a.at().y == y) {
+			actors[actors.length] = a;
+		}
+	}
+	return actors;
+}
+
+BaseGame.prototype.controlActors = function() {
+	var actors = [];
+	for (i = 0; i < Game.actors.length; i++) {
+		var a = Game.actors[i];
+		if (a.controllable) {
 			actors[actors.length] = a;
 		}
 	}
