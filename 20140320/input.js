@@ -41,6 +41,7 @@ Crafty.c('InputManager', {
 			}
 			if (result.length) {
 				Game.historyAdd([actorsMoved, [x, y], pushes]);
+				Game.checkVictory();
 			}
 		}
 	}

@@ -11,7 +11,8 @@ function BaseGame() {
 		moveCount: 0,
 		pushCount: 0,
 		moves: [],
-		curTime: 0
+		curTime: 0,
+		hasWon: false
 	};
 }
 
@@ -161,7 +162,7 @@ BaseGame.prototype.historyForward = function() {
 		return;
 	}
 	var diff = this.history.moves[this.history.curTime];
-	for (i = 0; i < diff[0].length; i++) {
+	for (var i = 0; i < diff[0].length; i++) {
 		diff[0][i].move(diff[1][0], diff[1][1], false, true);
 	}
 	this.history.moveCount += 1;
@@ -176,7 +177,7 @@ BaseGame.prototype.historyBackward = function() {
 	}
 	this.history.curTime -= 1;
 	var diff = this.history.moves[this.history.curTime];	
-	for (i = 0; i < diff[0].length; i++) {
+	for (var i = 0; i < diff[0].length; i++) {
 		diff[0][i].move(-diff[1][0], -diff[1][1], false, true);
 	}
 	this.history.moveCount -= 1;
@@ -190,21 +191,71 @@ BaseGame.prototype.updateGameBar = function() {
 	var histProg = this.history.curTime / this.history.moves.length * 100;
 	$('#progress .indicator').css('left', histProg + '%')
 	var histMargin = -3;
-	if (histProg == 0) {
+	if (histProg < 2) {
 		histMargin = 0;
-	} else if (histProg == 100) {
+	} else if (histProg > 98) {
 		histMargin = -6;
 	}
 	$('#progress .indicator').css('margin-left', histMargin);
 }
 
 BaseGame.prototype.getLevelsets = function() {
-	this.levelsetData = jQuery.getJSON('levelsets.json', '', this.loadLevelsets);
+	var fuckjsScoping = this;
+	this.levelsetData = jQuery.getJSON('levelsets.json', '', function(data) {fuckjsScoping.levelsets = data; fuckjsScoping.popLevelsets();});
 }
 
-BaseGame.prototype.loadLevelsets = function(data) {
-	console.log(data);
-	this.levelsets = data;
+BaseGame.prototype.popLevelsets = function() {
+	var menu = $('#levelset-menu .menu');
+	for (var i = 0; i < this.levelsets.length; i++) {
+		var title = this.levelsets[i].levelset.title;
+		menu.append($('<option></option>').attr('value', i).text(title));
+	}
+	var fuckjsScoping = this;
+	menu.change(function(e) {
+		fuckjsScoping.popLevels(e.originalEvent.target.selectedIndex);
+	});
+	$('#level-menu .menu').change(function(e) {
+		fuckjsScoping.loadLevelFromSet(e.originalEvent.target.selectedIndex);
+	});
+	this.popLevels(0);
+	this.loadLevelFromSet(0);
+}
+
+BaseGame.prototype.popLevels = function(lsIndex) {
+	this.lsIndex = lsIndex;
+	var levelset = this.levelsets[lsIndex];
+	$('#level-menu .menu option').remove();
+	var menu = $('#level-menu .menu');
+	for (var i = 0; i < levelset.levels.length; i++) {
+		var title = levelset.levels[i].title;
+		menu.append($('<option></option>').attr('value', i).text(title));
+	}
+	this.loadLevelFromSet(0);
+}
+
+BaseGame.prototype.loadLevelFromSet = function(lIndex) {
+	$('#level-menu .menu').blur();
+	this.lIndex = lIndex;
+	this.loadLevel(this.levelsets[this.lsIndex].levels[lIndex].data);
+	this.history.hasWon = false;
+}
+
+BaseGame.prototype.checkVictory = function() {
+	var vActors = this.vicActors();
+	for (var i = 0; i < vActors.length; i++) {
+		var oActors = this.actorsAt(vActors[i].at().x, vActors[i].at().y);
+		var isGood = false;
+		for (var j = 0; j < oActors.length; j++) {
+			if (vActors[i].vicReq & oActors[j].vicAllow) {
+				isGood = true;
+				break;
+			}
+		}
+		if (!isGood) {
+			return false;
+		}
+	}
+	return true;
 }
 
 Game = new BaseGame();
