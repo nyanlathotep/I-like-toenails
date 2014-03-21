@@ -23,8 +23,8 @@ BaseGame.prototype.h = function() {
 }
 
 BaseGame.prototype.init = function() {
-	Crafty.init(this.w(), this.h(), document.getElementById('game'));
-	Crafty.background('black');
+	Crafty.init(this.w(), this.h(), $('#game').get(0));
+	Crafty.background('#333333');
 	this.tiles = [];
 	this.actors = [];
 	this.clearLevel();
@@ -150,6 +150,9 @@ BaseGame.prototype.historyAdd = function(diff) {
 	this.history.moves = this.history.moves.slice(0, this.history.curTime);
 	this.history.moves = this.history.moves.concat([diff]);
 	this.history.curTime += 1;
+	this.history.pushCount += diff[2];
+	this.history.moveCount += 1;
+	this.updateGameBar();
 }
 
 BaseGame.prototype.historyForward = function() {
@@ -160,7 +163,10 @@ BaseGame.prototype.historyForward = function() {
 	for (i = 0; i < diff[0].length; i++) {
 		diff[0][i].move(diff[1][0], diff[1][1], false, true);
 	}
+	this.history.moveCount += 1;
+	this.history.pushCount += diff[2];
 	this.history.curTime += 1;
+	this.updateGameBar();
 }
 
 BaseGame.prototype.historyBackward = function() {
@@ -172,6 +178,16 @@ BaseGame.prototype.historyBackward = function() {
 	for (i = 0; i < diff[0].length; i++) {
 		diff[0][i].move(-diff[1][0], -diff[1][1], false, true);
 	}
+	this.history.moveCount -= 1;
+	this.history.pushCount -= diff[2];
+	this.updateGameBar();
+}
+
+BaseGame.prototype.updateGameBar = function() {
+	$('#moves .value').text(Game.history.moveCount)
+	$('#pushes .value').text(Game.history.pushCount)
+	var histProg = this.history.curTime / this.history.moves.length * 100;
+	$('#progress .indicator').css('left', histProg + '%')
 }
 
 Game = new BaseGame();

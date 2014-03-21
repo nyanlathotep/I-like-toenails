@@ -30,17 +30,17 @@ Crafty.c('InputManager', {
 		this.movePlayers = function(x, y) {
 			var pls = Game.controlActors();
 			var actorsMoved = [];
+			var pushes = 0;
 			for (var i = 0; i < pls.length; i++) {
 				result = pls[i].move(x, y, true);
 				if (result) {
 					actorsMoved = actorsMoved.concat(result);
-					Game.history.pushCount += result.length - 1;
+					pushes += result.length - 1;
 					result = pls[i].move(x, y, false);
 				}
 			}
 			if (result.length) {
-				Game.history.moveCount += 1;
-				Game.historyAdd([actorsMoved, [x, y]]);
+				Game.historyAdd([actorsMoved, [x, y], pushes]);
 			}
 		}
 	}

@@ -1,8 +1,76 @@
 <html>
-	<head></head>
+	<head>
+		<style>
+			body {
+				font-family: helvetica;
+			}
+			#game-container {
+				float: left;
+			}
+			#game-bar {
+				background-color: #111111;
+				clear: both;
+				padding: 0.5rem;
+			}
+			#game-bar * {
+				background-color: #111111;
+				color: #eeeeee;
+			}
+			#game-bar .score {
+				float: left;
+				padding: 0 1rem;
+			}
+			#game-bar .title {
+				text-align: center;
+				font-size: 75%;
+			}
+			#game-bar .value {
+				text-align: center;
+				font-weight: bold;
+			}
+			#game-bar .prog-bar {
+				float: left;
+				padding: 0 1rem;
+			}
+			#progress {
+				position: relative;
+				background: #DDD;
+				width: 150px;
+				height: 1rem;
+				margin: 0.2rem 0 0;
+			}
+			#progress .indicator {
+				background: #D33;
+				top: 0;
+				width: 5px;
+				height: 100%;
+				position: absolute;
+			}
+		</style>
+	</head>
 	<body>
-		<div id="game"></div>
+		<div id="game-container">
+			<div id="game"></div>
+			<div id="game-bar">
+				<div class="score" id="moves">
+					<div class="title">MOVES</div>
+					<div class="value">0</div>
+				</div>
+				<div class="score" id="pushes">
+					<div class="title">PUSHES</div>
+					<div class="value">0</div>
+				</div>
+				<div class="prog-bar" id="history-bar">
+					<div class="title">HISTORY</div>
+					<div id="progress">
+						<div class="indicator" style="left: 0%"></div>
+					</div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+		</div>
 		<script type="text/javascript" src="https://rawgithub.com/craftyjs/Crafty/release/dist/crafty-min.js"></script>
+		<script type="text/javascript" src="../jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="sokoban.js"></script>
 		<script type="text/javascript" src="grid.js"></script>
 		<script type="text/javascript" src="actor.js"></script>
