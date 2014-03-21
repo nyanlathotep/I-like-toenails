@@ -24,10 +24,12 @@ BaseGame.prototype.h = function() {
 
 BaseGame.prototype.init = function() {
 	Crafty.init(this.w(), this.h(), $('#game').get(0));
-	Crafty.background('#333333');
+	Crafty.background('#222222');
 	this.tiles = [];
 	this.actors = [];
-	this.clearLevel();
+	this.getLevelsets();
+	this.inputMan = Crafty.e('InputManager');
+	/*this.clearLevel();
 	this.loadLevel([
 			"    #####          ",
 			"    #___#          ",
@@ -40,9 +42,8 @@ BaseGame.prototype.init = function() {
 			"#####_###_#@##__..#",
 			"    #_____#########",
 			"    #######        "
-		]);
+		]);*/
 		
-	this.inputMan = Crafty.e('InputManager');
 }
 
 BaseGame.prototype.setTile = function(x, y, tile) {
@@ -188,6 +189,22 @@ BaseGame.prototype.updateGameBar = function() {
 	$('#pushes .value').text(Game.history.pushCount)
 	var histProg = this.history.curTime / this.history.moves.length * 100;
 	$('#progress .indicator').css('left', histProg + '%')
+	var histMargin = -3;
+	if (histProg == 0) {
+		histMargin = 0;
+	} else if (histProg == 100) {
+		histMargin = -6;
+	}
+	$('#progress .indicator').css('margin-left', histMargin);
+}
+
+BaseGame.prototype.getLevelsets = function() {
+	this.levelsetData = jQuery.getJSON('levelsets.json', '', this.loadLevelsets);
+}
+
+BaseGame.prototype.loadLevelsets = function(data) {
+	console.log(data);
+	this.levelsets = data;
 }
 
 Game = new BaseGame();
