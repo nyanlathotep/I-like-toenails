@@ -74,11 +74,15 @@ BaseGame.prototype.createActor = function(x, y, type) {
 }
 
 BaseGame.prototype.loadLevel = function(level) {
-	this.clearLevel();
 	var lw = level[0].length;
 	var lh = level.length;
+	if (lw > this.geometry.w || lh > this.geometry.h) {
+		alert('level too big');
+		return;
+	}
 	var bw = Math.floor((this.geometry.w - lw)/2);
 	var bh = Math.floor((this.geometry.h - lh)/2);
+	this.clearLevel();
 	for (j = 0; j < lh; j++) {
 		for (i = 0; i < lw; i++) {
 			var c = level[j][i];
@@ -103,6 +107,17 @@ BaseGame.prototype.loadLevel = function(level) {
 			}
 		}
 	}
+}
+
+BaseGame.prototype.actorsAt = function(x, y) {
+	var actors = [];
+	for (i = 0; i < Game.actors.length; i++) {
+		var a = Game.actors[i];
+		if (a.at().x == x && a.at().y == y) {
+			actors[actors.length] = a;
+		}
+	}
+	return actors;
 }
 
 Game = new BaseGame();

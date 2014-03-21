@@ -3,18 +3,15 @@ Crafty.c('Actor', {
 		this.addComponent('Grid');
 		this.ident = 1;
 		this.pushable = 0;
+		this.pathable = 0;
+		this.vicReq = 0;
+		this.vicAllow = 0;
 		
 		this.move = function(x, y) {
 			var newx = this.at().x + x;
 			var newy = this.at().y + y;
 			if (this.ident & Game.tiles[newx][newy].pathable) {
-				var actors = [];
-				for (i = 0; i < Game.actors.length; i++) {
-					var a = Game.actors[i];
-					if (a.at().x == newx && a.at().y == newy) {
-						actors[actors.length] = a;
-					}
-				}
+				var actors = Game.actorsAt(newx, newy);
 				for (i = 0; i < actors.length; i++) {
 					if (!(actors[i].pathable & this.ident)) {
 						if (actors[i].pushable & this.ident) {
@@ -70,6 +67,7 @@ Crafty.c('Crate', {
 				   z: 2});
 		this.pathable = 2;
 		this.pushable = 4;
+		this.vicReq = 1;
 	}	
 });
 
@@ -81,5 +79,6 @@ Crafty.c('Dest', {
 				   z: 1});
 		this.pathable = 5;
 		this.ident = 2;
+		this.vicAllow = 1;
 	}
 });
