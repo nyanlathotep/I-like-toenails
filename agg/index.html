@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<style>
+			#game-bar {
+				background-color: #333333;
+				position: fixed;
+				bottom: 0;
+				height: 60px;
+				left: 0;
+				right: 0;
+			}
+			#game-container {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+			}
+		</style>
+		<script type="text/javascript" src="https://rawgithub.com/craftyjs/Crafty/release/dist/crafty-min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js" ></script>
+		<script src="agg.js"></script>
+		<script>
+			window.addEventListener('load', function() {Game.init()});
+		</script>
+	</head>
+	<body>
+		<div id="game-container">
+			<div id="game"></div>
+			<div id="game-bar">
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+	</body>
+</html>
