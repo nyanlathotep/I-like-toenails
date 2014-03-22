@@ -1,15 +1,9 @@
 Game = {
 	geometry: {
-		w: 400,
-		h: 400,
-		bordersX: 10,
-		bordersY: 10,
-		offsetX: 0,
-		offsetY: 0,
-		board: {
-			w: 4,
-			h: 4
-		}
+		bf: 9,
+		w: 4,
+		h: 4,
+		d: {}
 	},
 	board: {
 		body: null,
@@ -21,12 +15,7 @@ Game = {
 	tiles: [],
 	init: function() {
 		Crafty.init(null, null, $('#game').get(0));
-		this.buildBoard();
-		this.geometry.w = 600;
-		this.geometry.h = 600;
-		this.geometry.bordersX = 15;
-		this.geometry.bordersY = 15;
-		this.resizeBoard();		
+		this.buildBoard();	
 	},
 	destroyTiles: function() {
 		for (var j = 0; j < this.tiles.length; j++) {
@@ -59,10 +48,10 @@ Game = {
 	},
 	buildBoard: function() {
 		this.destroyBoard();
-		for (var j = 0; j < this.geometry.board.h; j++) {
+		for (var j = 0; j < this.geometry.h; j++) {
 			this.board.tiles[j] = [];
 			this.tiles[j] = [];
-			for (var i = 0; i < this.geometry.board.w; i++) {
+			for (var i = 0; i < this.geometry.w; i++) {
 				var tile = Crafty.e('2D, Canvas, Color')
 					.color(this.board.color)
 				this.board.tiles[j][i] = tile;
@@ -75,25 +64,38 @@ Game = {
 		Crafty.background(this.board.bgcolor);
 		this.resizeBoard();
 	},
+	findBoardProps: function(w, h) {
+		var geo = {};
+		var ar = (this.geometry.w + (this.geometry.w + 1)/this.geometry.bf) /
+				 (this.geometry.h + (this.geometry.h + 1)/this.geometry.bf);
+		var sf = Math.min(w, h*ar);
+		geo.w = sf;
+		geo.h = sf/ar;
+		geo.ox = (w - geo.w) / 2;
+		geo.oy = (h - geo.h) / 2;
+		geo.t = (this.geometry.bf * geo.w) / ((this.geometry.bf + 1) * this.geometry.w + 1);
+		geo.b = geo.t / this.geometry.bf;
+		return geo;
+	},
 	resizeBoard: function() {
-		var tileW = this.geometry.w - this.geometry.bordersX * (this.geometry.board.w + 1);
-		tileW /= this.geometry.board.w;
-		var tileH = this.geometry.h - this.geometry.bordersY * (this.geometry.board.h + 1);
-		tileH /= this.geometry.board.h;
-		var tileX = tileW + this.geometry.bordersX;
-		var tileY = tileH + this.geometry.bordersY;
-		this.board.body.attr({x : this.geometry.offsetX, y : this.geometry.offsetY, z : 0, 
-		                      w : this.geometry.w, h : this.geometry.h});
-		for (var j = 0; j < this.geometry.board.h; j++) {
-			for (var i = 0; i < this.geometry.board.w; i++) {
+		var areaW = $('#game').width();
+		var areaH = $('#game').height() - $('#game-bar').height()
+		var geo = this.findBoardProps(areaW, areaH);
+		this.geometry.d = geo;
+		this.board.body.attr({w : geo.w, h: geo.h, x : geo.ox, y: geo.oy});
+		for (var j = 0; j < this.geometry.h; j++) {
+			for (var i = 0; i < this.geometry.w; i++) {
 				props = {
-					w : tileW,
-					x : tileX * i + this.geometry.bordersX + this.geometry.offsetX, 
-					h : tileH, 
-					y : tileY * j + this.geometry.bordersY + this.geometry.offsetY,
-					z : 1
+					w: geo.t,
+					h: geo.t,
+					x: geo.t * i + geo.b * (i + 1) + geo.ox,
+					y: geo.t * j + geo.b * (j + 1) + geo.oy,
+					z: 1
 				};
 				this.board.tiles[j][i].attr(props);
+				if (this.tiles[j][i]) {
+					this.tiles[j][i].attr(props);
+				}
 			}
 		}
 	}
