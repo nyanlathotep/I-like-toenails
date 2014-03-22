@@ -54,6 +54,7 @@ Game = {
 			for (var i = 0; i < this.geometry.w; i++) {
 				var tile = Crafty.e('2D, Canvas, Color')
 					.color(this.board.color)
+					.attr({z: 1});
 				this.board.tiles[j][i] = tile;
 				this.tiles[j][i] = null;
 			}
@@ -85,18 +86,21 @@ Game = {
 		this.board.body.attr({w : geo.w, h: geo.h, x : geo.ox, y: geo.oy});
 		for (var j = 0; j < this.geometry.h; j++) {
 			for (var i = 0; i < this.geometry.w; i++) {
-				props = {
-					w: geo.t,
-					h: geo.t,
-					x: geo.t * i + geo.b * (i + 1) + geo.ox,
-					y: geo.t * j + geo.b * (j + 1) + geo.oy,
-					z: 1
-				};
+				var props = this.boardPosition(i, j);
 				this.board.tiles[j][i].attr(props);
 				if (this.tiles[j][i]) {
-					this.tiles[j][i].attr(props);
+					this.tiles[j][i].resize(props);
 				}
 			}
 		}
+	},
+	boardPosition: function(x, y) {
+		props = {
+			w: this.geometry.d.t,
+			h: this.geometry.d.t,
+			x: this.geometry.d.t * x + this.geometry.d.b * (x + 1) + this.geometry.d.ox,
+			y: this.geometry.d.t * y + this.geometry.d.b * (y + 1) + this.geometry.d.oy
+		};
+		return props
 	}
 };
