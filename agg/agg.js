@@ -15,21 +15,32 @@ Game = {
 		font: 'Tahoma'
 	},
 	tiles: [],
+	validMoves: [],
 	init: function() {
 		Crafty.init(null, null, $('#game').get(0));
 		this.buildBoard();	
 		this.gamemode = Gamemodes.test;
 		this.gamemode.parent = this;
+		this.validMoves[-1] = [];
+		this.validMoves[0] = [];
+		this.validMoves[1] = [];
+		this.inputMan = Crafty.e('InputManager');
 		
-		for (i = 0; i < 4; i++) {
-			for (j = 0; j < 4; j++) {
+		for (var i = 0; i < 4; i++) {
+			for (var j = 0; j < 4; j++) {
 				var tile = Crafty.e('Tile');
 				tile.val = 2;
 				tile.setText(2);
-				this.tiles[j][i] = tile;
+				this.placeTile(tile, i, j);
 			}
 		}
 		this.updateTiles();
+		this.checkMoves();
+	},
+	placeTile: function(tile, x, y) {
+		tile.tileX = x;
+		tile.tileY = y;
+		this.tiles[y][x] = tile;
 	},
 	destroyTiles: function() {
 		for (var j = 0; j < this.tiles.length; j++) {
@@ -104,6 +115,7 @@ Game = {
 				this.board.tiles[j][i].attr(props);
 			}
 		}
+		this.updateTiles();
 	},
 	updateTiles: function() {
 		for (var j = 0; j < this.geometry.h; j++) {
@@ -124,104 +136,126 @@ Game = {
 		};
 		return props
 	},
-	moveRow: function(y, dir, test) {
+	moveLine: function(line, test) {
 		var spot1 = 0;
-		if (dir == -1) {
-			spot1 = this.geometry.w - 1;
-		}
-		var spot2 = spot1;
-		var dest1 = this.geometry.w - 1;
-		var dest2 = dest1 + 1;
-		if (dir == -1) {
-			dest1 = 0;
-			dest2 = -1;
-		}
-		while (spot1 != dest1 && spot2 != dest2) {
+		var spot2 = 0;
+		var haveMerged = false;
+		while (spot2 != line.length) {
 			if (spot1 == spot2) {
-				spot2 += dir;
-			} else if (this.tiles[y][spot1]) {
-				if (this.tiles[y][spot2]) {
-					if (this.gamemode.merge(this.tiles[y][spot1], 
-											this.tiles[y][spot2], true)) {
+				spot2 += 1;
+			} else if (line[spot1]) {
+				if (line[spot2]) {
+					if (this.gamemode.canMerge(line[spot1], line[spot2])
+						&& !(this.gamemode.mergeOne && haveMerged)) {
 						if (test) {
+							console.log('can merge');
 							return true;
 						}
-						var tile = this.gamemode.merge(this.tiles[y][spot1], 
-													   this.tiles[y][spot2]);
-						this.tiles[y][spot1].destroy();
-						this.tiles[y][spot2].destroy();
-						this.tiles[y][spot1] = tile;
-						this.tiles[y][spot2] = null;
+						var tile = this.gamemode.doMerge(line[spot1], line[spot2]);
+						line[spot1].destroy();
+						line[spot2].destroy();
+						line[spot1] = tile;
+						line[spot2] = null;
+						haveMerged = true;
 					}
-					spot1 += dir;
+					spot1 += 1;
 				} else {
-					spot2 += dir;
+					spot2 += 1;
 				}
 			} else {
-				if (this.tiles[y][spot2]) {
+				if (line[spot2]) {
+					if (line[spot2].immobile) {
+						spot1 = spot2;
+						spot2 += 1;
+						continue;
+					}
 					if (test) {
+						console.log('can move', spot1, spot2);
 						return true;
 					}
-					this.tiles[y][spot1] = this.tiles[y][spot2];
-					this.tiles[y][spot2] = null;
+					line[spot1] = line[spot2];
+					line[spot2] = null;
 				}
 				else {
-					spot2 += dir;
+					spot2 += 1;
 				}
+			}
+			if ((spot2 - spot1) > 1 && this.gamemode.moveOne) {
+				spot1 = spot2 - 1;
 			}
 		}
 		if (test) {
 			return false;
 		}
+		return line;
 	},
-	moveCol: function(x, dir, test) {
-		var spot1 = 0;
-		if (dir == -1) {
-			spot1 = this.geometry.h - 1;
-		}
-		var spot2 = spot1;
-		var dest1 = this.geometry.h - 1;
-		var dest2 = dest1 + 1;
-		if (dir == -1) {
-			dest1 = 0;
-			dest2 = -1;
-		}
-		while (spot1 != dest1 && spot2 != dest2) {
-			if (spot1 == spot2) {
-				spot2 += dir;
-			} else if (this.tiles[spot1][x]) {
-				if (this.tiles[spot2][x]) {
-					if (this.gamemode.merge(this.tiles[spot1][x], 
-											this.tiles[spot2][x], true)) {
-						if (test) {
-							return true;
-						}
-						var tile = this.gamemode.merge(this.tiles[spot1][x], 
-													   this.tiles[spot2][x]);
-						this.tiles[spot1][x].destroy();
-						this.tiles[spot2][x].destroy();
-						this.tiles[spot1][x] = tile;
-						this.tiles[spot2][x] = null;
-					}
-					spot1 += dir;
-				} else {
-					spot2 += dir;
+	move: function(x, y, test) {
+		if (x == -1) {
+			for (var j = 0; j < this.geometry.h; j++) {
+				if (!test) {
+					this.moveLine(this.tiles[j]);
+				}else if (this.moveLine(this.tiles[j], true)) {
+					console.log(j);
+					return true;
 				}
-			} else {
-				if (this.tiles[spot2][x]) {
-					if (test) {
-						return true;
-					}
-					this.tiles[spot1][x] = this.tiles[spot2][x];
-					this.tiles[spot2][x] = null;
+			}
+		} else if (x == 1) {
+			for (var j = 0; j < this.geometry.h; j++) {
+				var line = [];
+				for (var i = 0; i < this.geometry.w; i++) {
+					line[i] = this.tiles[j][this.geometry.w-1-i]
 				}
-				else {
-					spot2 += dir;
+				if (!test) {
+					var line = this.moveLine(line);
+					this.tiles[j] = line.reverse();
+				} else if (this.moveLine(line, true)) {
+					return true;
+				}
+			}
+		} else {
+			for (var i = 0; i < this.geometry.w; i++) {
+					var line = [];
+				for (var j = 0; j < this.geometry.h; j++) {
+					line[j] = this.tiles[j][i];
+				}
+				if (y == -1) {
+					line.reverse();
+				}
+				if (!test) {
+					line = this.moveLine(line);
+					if (y == -1) {
+						line.reverse();
+					}
+					for (var j = 0; j < this.geometry.h; j++) {
+						this.tiles[j][i] = line[j];
+					}
+				}
+				else if (this.moveLine(line, true)) {
+					return true;
 				}
 			}
 		}
 		if (test) {
 			return false;
 		}
+		Game.gamemode.postMove();
+		Game.updateTiles();
+	},
+	randFreeSpot: function() {
+		var spots = [];
+		for (var i = 0; i < this.geometry.w; i++) {
+			for (var j = 0; j < this.geometry.h; j++) {
+				if (!this.tiles[j][i]) {
+					spots[spots.length] = {x: i, y: j};
+				}
+			}
+		}
+		return spots[randint(0, spots.length - 1)];
+	},
+	checkMoves: function() {
+		this.validMoves[1][0] = this.move(1, 0, true);
+		this.validMoves[-1][0] = this.move(-1, 0, true);
+		this.validMoves[0][1] = this.move(0, 1, true);
+		this.validMoves[0][-1] = this.move(0, -1, true);
 	}
 };

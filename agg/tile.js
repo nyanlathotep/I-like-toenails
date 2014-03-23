@@ -6,6 +6,8 @@ Crafty.c('Tile', {
 		this.text = null;
 		this.attr({z: 2});
 		this.attr(Game.boardPosition(0,0));
+		this.hasMerged = false;
+		this.immobile = false;
 	},
 	setText: function(text) {
 		if (!this.text) {

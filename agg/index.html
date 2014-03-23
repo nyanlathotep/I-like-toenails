@@ -22,7 +22,12 @@
 		<script src="agg.js"></script>
 		<script src="tile.js"></script>
 		<script src="gamemode.js"></script>
+		<script src="input.js"></script>
 		<script>
+			function randint(a,b) {
+				return Math.floor(Math.random() * (b+1-a) + a);
+			}
+		
 			window.addEventListener('load', function() {Game.init()});
 			$(window).on("debouncedresize", function() {Game.resizeBoard()});
 		</script>
