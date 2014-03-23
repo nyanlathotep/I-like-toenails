@@ -1,5 +1,9 @@
 Gamemodes = {
 	test: {
+		init: function() {
+			this.spawn()
+			this.spawn()
+		},
 		canMerge: function(tile1, tile2) {
 			return tile1.val == tile2.val && !tile1.hasMerged && !tile2.hasMerged;
 		},
@@ -18,6 +22,13 @@ Gamemodes = {
 					}
 				}
 			}
+		},
+		spawn: function() {
+			var spot = Game.randFreeSpot();
+			var tile = Crafty.e('Tile');
+			tile.val = 2 + 2 * (randint(1,20)==20);
+			tile.setText(tile.val);
+			Game.placeTile(tile, spot.x, spot.y);
 		},
 		moveOne: false,
 		mergeOne: false

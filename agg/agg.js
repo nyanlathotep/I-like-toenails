@@ -21,19 +21,12 @@ Game = {
 		this.buildBoard();	
 		this.gamemode = Gamemodes.test;
 		this.gamemode.parent = this;
+		this.gamemode.init();
 		this.validMoves[-1] = [];
 		this.validMoves[0] = [];
 		this.validMoves[1] = [];
 		this.inputMan = Crafty.e('InputManager');
 		
-		for (var i = 0; i < 4; i++) {
-			for (var j = 0; j < 4; j++) {
-				var tile = Crafty.e('Tile');
-				tile.val = 2;
-				tile.setText(2);
-				this.placeTile(tile, i, j);
-			}
-		}
 		this.updateTiles();
 		this.checkMoves();
 	},
@@ -148,7 +141,6 @@ Game = {
 					if (this.gamemode.canMerge(line[spot1], line[spot2])
 						&& !(this.gamemode.mergeOne && haveMerged)) {
 						if (test) {
-							console.log('can merge');
 							return true;
 						}
 						var tile = this.gamemode.doMerge(line[spot1], line[spot2]);
@@ -170,7 +162,6 @@ Game = {
 						continue;
 					}
 					if (test) {
-						console.log('can move', spot1, spot2);
 						return true;
 					}
 					line[spot1] = line[spot2];
@@ -195,7 +186,6 @@ Game = {
 				if (!test) {
 					this.moveLine(this.tiles[j]);
 				}else if (this.moveLine(this.tiles[j], true)) {
-					console.log(j);
 					return true;
 				}
 			}

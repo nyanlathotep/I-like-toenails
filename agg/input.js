@@ -13,7 +13,12 @@ Crafty.c('InputManager', {
 			}
 		}
 		this.tryMove = function(x, y) {
-			Game.move(x, y);
+			if (Game.validMoves[x][y]) {
+				Game.move(x, y);
+				Game.gamemode.spawn();
+				Game.updateTiles();
+				Game.checkMoves();
+			}
 		}
 		this.bind('KeyDown', this.handleKB);
 	}
