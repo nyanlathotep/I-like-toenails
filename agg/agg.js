@@ -1,6 +1,7 @@
 Game = {
 	geometry: {
 		bf: 9,
+		tf: 2,
 		w: 4,
 		h: 4,
 		d: {}
@@ -10,12 +11,25 @@ Game = {
 		tiles: [],
 		color: '#dddddd',
 		framecolor: '#888888',
-		bgcolor: '#555555'
+		bgcolor: '#555555',
+		font: 'Tahoma'
 	},
 	tiles: [],
 	init: function() {
 		Crafty.init(null, null, $('#game').get(0));
 		this.buildBoard();	
+		this.gamemode = Gamemodes.test;
+		this.gamemode.parent = this;
+		
+		for (i = 0; i < 4; i++) {
+			for (j = 0; j < 4; j++) {
+				var tile = Crafty.e('Tile');
+				tile.val = 2;
+				tile.setText(2);
+				this.tiles[j][i] = tile;
+			}
+		}
+		this.updateTiles();
 	},
 	destroyTiles: function() {
 		for (var j = 0; j < this.tiles.length; j++) {
@@ -88,7 +102,14 @@ Game = {
 			for (var i = 0; i < this.geometry.w; i++) {
 				var props = this.boardPosition(i, j);
 				this.board.tiles[j][i].attr(props);
+			}
+		}
+	},
+	updateTiles: function() {
+		for (var j = 0; j < this.geometry.h; j++) {
+			for (var i = 0; i < this.geometry.w; i++) {
 				if (this.tiles[j][i]) {
+					var props = this.boardPosition(i, j);
 					this.tiles[j][i].resize(props);
 				}
 			}
@@ -102,5 +123,105 @@ Game = {
 			y: this.geometry.d.t * y + this.geometry.d.b * (y + 1) + this.geometry.d.oy
 		};
 		return props
+	},
+	moveRow: function(y, dir, test) {
+		var spot1 = 0;
+		if (dir == -1) {
+			spot1 = this.geometry.w - 1;
+		}
+		var spot2 = spot1;
+		var dest1 = this.geometry.w - 1;
+		var dest2 = dest1 + 1;
+		if (dir == -1) {
+			dest1 = 0;
+			dest2 = -1;
+		}
+		while (spot1 != dest1 && spot2 != dest2) {
+			if (spot1 == spot2) {
+				spot2 += dir;
+			} else if (this.tiles[y][spot1]) {
+				if (this.tiles[y][spot2]) {
+					if (this.gamemode.merge(this.tiles[y][spot1], 
+											this.tiles[y][spot2], true)) {
+						if (test) {
+							return true;
+						}
+						var tile = this.gamemode.merge(this.tiles[y][spot1], 
+													   this.tiles[y][spot2]);
+						this.tiles[y][spot1].destroy();
+						this.tiles[y][spot2].destroy();
+						this.tiles[y][spot1] = tile;
+						this.tiles[y][spot2] = null;
+					}
+					spot1 += dir;
+				} else {
+					spot2 += dir;
+				}
+			} else {
+				if (this.tiles[y][spot2]) {
+					if (test) {
+						return true;
+					}
+					this.tiles[y][spot1] = this.tiles[y][spot2];
+					this.tiles[y][spot2] = null;
+				}
+				else {
+					spot2 += dir;
+				}
+			}
+		}
+		if (test) {
+			return false;
+		}
+	},
+	moveCol: function(x, dir, test) {
+		var spot1 = 0;
+		if (dir == -1) {
+			spot1 = this.geometry.h - 1;
+		}
+		var spot2 = spot1;
+		var dest1 = this.geometry.h - 1;
+		var dest2 = dest1 + 1;
+		if (dir == -1) {
+			dest1 = 0;
+			dest2 = -1;
+		}
+		while (spot1 != dest1 && spot2 != dest2) {
+			if (spot1 == spot2) {
+				spot2 += dir;
+			} else if (this.tiles[spot1][x]) {
+				if (this.tiles[spot2][x]) {
+					if (this.gamemode.merge(this.tiles[spot1][x], 
+											this.tiles[spot2][x], true)) {
+						if (test) {
+							return true;
+						}
+						var tile = this.gamemode.merge(this.tiles[spot1][x], 
+													   this.tiles[spot2][x]);
+						this.tiles[spot1][x].destroy();
+						this.tiles[spot2][x].destroy();
+						this.tiles[spot1][x] = tile;
+						this.tiles[spot2][x] = null;
+					}
+					spot1 += dir;
+				} else {
+					spot2 += dir;
+				}
+			} else {
+				if (this.tiles[spot2][x]) {
+					if (test) {
+						return true;
+					}
+					this.tiles[spot1][x] = this.tiles[spot2][x];
+					this.tiles[spot2][x] = null;
+				}
+				else {
+					spot2 += dir;
+				}
+			}
+		}
+		if (test) {
+			return false;
+		}
 	}
 };
