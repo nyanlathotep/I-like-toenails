@@ -7,7 +7,6 @@ Crafty.c('Tile', {
 				   x: 0,
 				   y: 0,
 				   z: 0});
-		this.mutable = true;
 		this.glyph = Crafty.e('Glyph');
 		this.glyph.attr({w: Game.geometry.tile.w, 
 				   h: Game.geometry.tile.h,
@@ -15,6 +14,9 @@ Crafty.c('Tile', {
 				   y: 0,
 				   z: 1});
 		this.attach(this.glyph);
+		
+		this.mutable = true;
+		this.function = ' ';
 	},
 	at: function(x, y) {
 		if (x === undefined || y === undefined) {
@@ -31,6 +33,6 @@ Crafty.c('Tile', {
 Crafty.c('Glyph', {
 	init: function() {
 		this.addComponent('2D, Canvas, Image');
-		this.image('assets/glyphs/blank.png');
+		this.image(Game.glyphs[' ']);
 	}
 });
