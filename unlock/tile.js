@@ -27,6 +27,9 @@ Crafty.c('Tile', {
 			            y: (y + 1) * Game.geometry.tile.h});
 			return this;
 		}
+	},
+	setFunc: function(func) {
+		
 	}
 });
 

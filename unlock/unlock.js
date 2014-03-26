@@ -14,9 +14,6 @@ Game = {
 	h: function() {
 		return (this.geometry.h + 2) * this.geometry.tile.h;
 	},
-	preInit: function() {
-		this.initGlyphs();
-	},
 	initGlyphs: function() {
 		this.glyphs = {};
 		this.glyphs[' '] = 'assets/blank.png';
@@ -57,6 +54,7 @@ Game = {
 		Crafty.load(assets, this.init);
 	},
 	init: function() {
+		this.initGlyphs();
 		Crafty.init(this.w(), this.h(), $('#game').get(0));
 		Crafty.background('#221133');
 		
