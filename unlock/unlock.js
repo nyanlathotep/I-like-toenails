@@ -14,17 +14,8 @@ Game = {
 	h: function() {
 		return (this.geometry.h + 2) * this.geometry.tile.h;
 	},
-	init: function() {
+	preInit: function() {
 		this.initGlyphs();
-		Crafty.init(this.w(), this.h(), $('#game').get(0));
-		Crafty.background('#221133');
-		
-		for (var i = 0; i < this.geometry.w; i++) {
-			for (var j = 0; j < this.geometry.h; j++) {
-				Crafty.e('Tile')
-					.at(i, j);
-			}
-		}
 	},
 	initGlyphs: function() {
 		this.glyphs = {};
@@ -63,6 +54,17 @@ Game = {
 			assets = assets.concat(this.glyphs[k]);
 		}
 		
-		Crafty.load(assets);
+		Crafty.load(assets, this.init);
+	},
+	init: function() {
+		Crafty.init(this.w(), this.h(), $('#game').get(0));
+		Crafty.background('#221133');
+		
+		for (var i = 0; i < this.geometry.w; i++) {
+			for (var j = 0; j < this.geometry.h; j++) {
+				Crafty.e('Tile')
+					.at(i, j);
+			}
+		}
 	}
 };
