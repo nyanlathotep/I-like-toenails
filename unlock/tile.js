@@ -1,7 +1,7 @@
 Crafty.c('Tile', {
 	init: function() {
 		this.addComponent('2D, Canvas, Color');
-		this.color('#005869');
+		this.color('red');
 		this.attr({w: Game.geometry.tile.w, 
 				   h: Game.geometry.tile.h,
 				   x: 0,
@@ -16,7 +16,9 @@ Crafty.c('Tile', {
 		this.attach(this.glyph);
 		
 		this.mutable = true;
-		this.function = ' ';
+		this.func = ' ';
+		this.group = 0;
+		this.selected = false;
 	},
 	at: function(x, y) {
 		if (x === undefined || y === undefined) {
@@ -29,7 +31,26 @@ Crafty.c('Tile', {
 		}
 	},
 	setFunc: function(func) {
-		
+		if (Game.glyphs[func]) {
+			this.func = func;
+			this.glyph.image(Game.glyphs[func]);
+		}
+	},
+	setGroup: function(group) {
+		if (group < Game.groups.length) {
+			this.group = group;
+			this.color(Game.groups[group].color);
+		}
+	},
+	setSelected: function(sel) {
+		if (this.selected != sel) {
+			this.selected = sel;
+			if (sel) {
+				this.attr({y: this.y - Game.geometry.tile.h / 2});
+			} else {
+				this.attr({y: this.y + Game.geometry.tile.h / 2});
+			}
+		}
 	}
 });
 

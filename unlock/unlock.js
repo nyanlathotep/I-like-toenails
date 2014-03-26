@@ -8,11 +8,14 @@ Game = {
 		}
 	},
 	tiles: [],
+	groups: [{color: '#005869'},
+			 {color: '#00856A'}, 
+	         {color: '#8DB500'}],
 	w: function() {
 		return (this.geometry.w + 2) * this.geometry.tile.w;
 	},
 	h: function() {
-		return (this.geometry.h + 2) * this.geometry.tile.h;
+		return (this.geometry.h + 3) * this.geometry.tile.h;
 	},
 	initGlyphs: function() {
 		this.glyphs = {};
@@ -51,18 +54,32 @@ Game = {
 			assets = assets.concat(this.glyphs[k]);
 		}
 		
-		Crafty.load(assets, this.init);
+		Crafty.load(assets);
 	},
 	init: function() {
 		this.initGlyphs();
 		Crafty.init(this.w(), this.h(), $('#game').get(0));
 		Crafty.background('#221133');
 		
-		for (var i = 0; i < this.geometry.w; i++) {
-			for (var j = 0; j < this.geometry.h; j++) {
-				Crafty.e('Tile')
+		for (var j = 0; j < this.geometry.h; j++) {
+			this.tiles[j] = [];
+			for (var i = 0; i < this.geometry.w; i++) {
+				this.tiles[j][i] = Crafty.e('Tile')
 					.at(i, j);
 			}
 		}
+		this.buildEditor();
+	},
+	buildEditor: function() {
+		for (var i = 0; i < this.groups.length; i++) {
+			this.groups[i].tile = Crafty.e('Tile')
+				.at(i - 1, this.geometry.h + 1);
+			this.groups[i].tile.setGroup(i);
+		}
+		this.groups[0].tile.setSelected(true);
+		this.buildEditorGroup(0);
+	},
+	buildEditorGroup: function(group) {
+		
 	}
 };
