@@ -66,6 +66,7 @@ Game = {
 			for (var i = 0; i < this.geometry.w; i++) {
 				this.tiles[j][i] = Crafty.e('Tile')
 					.at(i, j);
+				this.tiles[j][i].setGroup(0);
 			}
 		}
 		this.buildEditor();
