@@ -8,7 +8,7 @@ Game = {
 		}
 	},
 	tiles: [],
-	groups: [{color: '#005869', funcs: ['#', '^', 'v', '<', '>', 'Y', 'X']},
+	groups: [{color: '#005869', funcs: ['#', '^', 'v', '<', '>', 'Y', 'X', '.']},
 			 {color: '#00856A', funcs: ['#', '^', 'v', '<', '>', '++', '--', '<<', '>>',
 			                            '+', '-', '*', '/', '~']}, 
 	         {color: '#8DB500', funcs: ['#', '^', 'v', '<', '>', '++', '--', '<<', '>>',
@@ -71,25 +71,7 @@ Game = {
 	init: function() {
 		Crafty.init(this.w(), this.h(), $('#game').get(0));
 		Crafty.background('#221133');
-		this.buildEditor();
-		
-		var level = {
-			offX: 0,
-			offY: 0,
-			data: [
-				'__________________',
-				'__________________',
-				'__________________',
-				'__________________',
-				'>_________________',
-				'__________________',
-				'__________________',
-				'__________________',
-				'__________________',
-				'  ________________'
-			]
-		};
-		this.buildLevel(level);
+		this.buildLevel(Levels[12]);
 	},
 	resetLevel: function() {
 		for (var j = 0; j < this.geometry.h; j++) {
@@ -129,8 +111,44 @@ Game = {
 			}
 		}
 		this.level = level;
+		if (level.allowedOps) {
+			this.groups[0].funcs = level.allowedOps[0];
+			this.groups[1].funcs = level.allowedOps[1];
+			if (level.allowedOps.length == 2) {
+				this.groups[2].funcs = level.allowedOps[1];			
+			} else {
+				this.groups[2].funcs = level.allowedOps[2];					
+			}
+		} else {
+			this.groups[0].funcs = ['#', '^', 'v', '<', '>', 'Y', 'X'];
+			this.groups[1].funcs = ['#', '^', 'v', '<', '>', '++', '--', '<<', '>>', '+', '-', '*', '/', '~'];
+			this.groups[2].funcs = this.groups[1].funcs;
+		}
+		this.buildEditor();
+	},
+	resetEditor: function() {
+		for (var i = 0; i < this.groups.length; i++) {
+			if (this.groups[i].tile) {
+				this.groups[i].tile.destroy();
+			}
+			this.groups[i].tile = null;
+		}
+		this.selGroup = null;
+		for (var i = 0; i < this.editorTiles.length; i++) {
+			if (this.editorTiles[i]) {
+				console.log(this.editorTiles[i]);
+				this.editorTiles[i].destroy();
+			}
+			this.editorTiles[i] = null;		
+		}
+		this.selEdit = null;
+		if (this.blankTile) {
+			this.blankTile.destroy();
+		}
+		this.blankTile = null;
 	},
 	buildEditor: function() {
+		this.resetEditor();
 		for (var i = 0; i < this.groups.length; i++) {
 			var tile = Crafty.e('Tile');
 			tile.at(i, 0);
@@ -163,14 +181,16 @@ Game = {
 		this.selGroup = group;
 		this.groups[group].tile.setSelected(true);
 		for (var i = 0; i < this.groups[group].funcs.length; i++) {
-			var tile = Crafty.e('Tile');
-			tile.setFunc(this.groups[group].funcs[i]);
-			tile.setGroup(group);
-			tile.isEditor = 2;
-			tile.index = i;
-			tile.offX = this.groups.length + 2;
-			tile.at(i, 0);
-			this.editorTiles[i] = tile;
+				if (this.groups[group].funcs[i] != null) {
+				var tile = Crafty.e('Tile');
+				tile.setFunc(this.groups[group].funcs[i]);
+				tile.setGroup(group);
+				tile.isEditor = 2;
+				tile.index = i;
+				tile.offX = this.groups.length + 2;
+				tile.at(i, 0);
+				this.editorTiles[i] = tile;
+			}
 		}
 	},
 	selectEdit: function(edit) {
