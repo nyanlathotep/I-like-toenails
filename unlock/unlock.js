@@ -47,17 +47,20 @@ Game = {
 		this.glyphs['.<'] = 'assets/start-l.png';
 		this.glyphs['.^'] = 'assets/start-u.png';
 		this.glyphs['.v'] = 'assets/start-d.png';
+	},
+	preInit: function() {
+		this.initGlyphs();
 		
 		var assets = [];
 		
 		for (var k in this.glyphs) {
 			assets = assets.concat(this.glyphs[k]);
+			//console.log([this.glyphs[k]]);
+			//Crafty.load(k);
 		}
-		
-		Crafty.load(assets);
-	},
+		Crafty.load(assets, function() {Game.init()});
+	},	
 	init: function() {
-		this.initGlyphs();
 		Crafty.init(this.w(), this.h(), $('#game').get(0));
 		Crafty.background('#221133');
 		
