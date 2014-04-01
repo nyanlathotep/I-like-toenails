@@ -383,10 +383,10 @@ Levels = [
 		},
 		goal: function() {
 			return [randint(75, 99), 0, 0, 0];
-		}
+		},
 		verify: function(init, fin, goal) {
 			return fin[0] == goal[0];
-		}
+		},
 		allowedOps: [
 			['#', '^', 'v', '<', '>', 'Y', 'X'],
 			['#', '^', 'v', '<', '>', '++', '--', '<<', '>>', null, null, null, null, '~']
