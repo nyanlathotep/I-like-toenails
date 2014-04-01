@@ -418,7 +418,7 @@ Levels = [
 		},
 		verify: function(init, fin) {
 			return fin[0] == init[1] && fin[1] == init[0];
-		}
+		},
 		allowedOps: [
 			['#', '^', 'v', '<', '>', 'Y', 'X'],
 			['#', '^', 'v', '<', '>', '++', '--', '<<', '>>', null, null, null, null, '~']
